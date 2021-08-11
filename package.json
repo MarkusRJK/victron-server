@@ -1,30 +1,31 @@
 {
-  "name": "vedirect",
-  "version": "0.2.0",
-  "description": "VE.Direct",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Moki38/vedirect.git"
-  },
-  "keywords": [
-    "Raspberry PI",
-    "Boat Automation",
-    "Node.js",
-    "MPPT",
-    "BMV",
-    "Ve.direct"
-  ],
-  "dependencies": {
-    "terminal-kit": "~0.24.0",
-    "serialport": "~4.0.0"
-  },
-  "author": {
-    "name": "Eric van Dijken <eric@team-moki.nl>"
-  },
-  "scripts": {
-    "start": "node test.js"
-  },
-  "license": "MIT"
+    "name": "victron-server",
+    "version": "1.0.0",
+    "description": "Victron Device server",
+    "main": "index.js",
+    "_repository": {
+        "type": "git",
+        "url": "https://github.com/MarkusRJK/victron-server.git"
+    },
+    "keywords": [
+        "Raspberry PI",
+        "Battery management",
+        "BMV",
+        "Phoenix Inverter",
+        "Ve.direct",
+        "Victron"
+    ],
+    "dependencies": {
+        "date": "^1.0.2",
+        "log4js": "^2.0.0",
+        "mathjs": "^5.1.0",
+        "serialport": "^9.1.0"
+    },
+    "author": {
+        "name": "Eric van Dijken <eric@team-moki.nl>, Markus Kohler <Markus.Kohler@udo.edu>"
+    },
+    "scripts": {
+        "test": "node hexconv-test.js"
+    },
+    "license": "MIT"
 }
-
