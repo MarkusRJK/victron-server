@@ -866,7 +866,7 @@ class ReceiverTransmitter {
     }
     
     runOnFunction(key, obj) {
-        let changeObj = null;
+        let changeObj;
         // value received by serial parser ==> newValue != null, only null is an indicator that
         // object is not dirty
         if (obj.newValue !== null && obj.value != obj.newValue)
@@ -877,26 +877,32 @@ class ReceiverTransmitter {
             // changeObj becomes non-null only if it is a number and sufficiently different
             // or if it is a string, object etc.
             if (typeof obj.newValue === 'number') {
-                const ov = this.SIValues(obj);
-                //if (Math.abs(obj.value - obj.newValue) * obj.nativeToUnitFactor >= obj.delta)
-                if (Math.abs(ov.value - ov.newValue) >= obj.delta)
-                {
-                    for (let i = 0; i < obj.on.length; ++i) {
-                        try {
-                            if (obj.on[i])
-                                obj.on[i](ov.newValue, ov.value, this.packageArrivalTime, key);
-                        }
-                        catch (err) {
-                            logger.error('runOnFunction(' + key + '): ' + err);
-                        }
-                    }
-                    changeObj = ov;
+                changeObj = this.SIValues(obj);
+            }
+            else {
+                changeObj = {
+                    value:    obj.value,
+                    newValue: obj.newValue
+                };
+            }
+            let mapFunction = function(f, idx) {
+                try { 
+                    // secure each function f by try/catch so a failing one
+                    // does not fail all functions of the 'on' array
+                    if (f) 
+                        f(changeObj.newValue, changeObj.value, this.packageArrivalTime, key);
+                }
+                catch (err) {
+                    logger.error('runOnFunction(' + key + ', ' + idx + '): ' + err);
                 }
             }
-            else changeObj = {
-                value:    obj.value,
-                newValue: obj.newValue
-            };
+            if ((typeof obj.newValue !== 'number')
+                || ((typeof obj.newValue === 'number') 
+                    && (Math.abs(changeObj.value - changeObj.newValue) >= obj.delta)))
+            {
+                obj.on.map(mapFunction.bind(this));
+            }
+            else changeObj = null;
         }
         return changeObj;
     }
@@ -918,18 +924,19 @@ class ReceiverTransmitter {
         // go through all cached data objects and call their on() functions
         // so that all on() functions can rely on newValue being != null and new
         // and value is the previous value
-        bmvdata.isDirty = true;
-        let i = 0;
+        bmvdata.isDirty = true; // ensure to enter the while-loop
+        let i = -1;
         while (bmvdata.isDirty) {
+            bmvdata.isDirty = false; // isDirty may be set in an ".on"-function
+            ++i;
             for (const[key, obj] of Object.entries(bmvdata)) {
-                bmvdata.isDirty = false; // isDirty may be set in an ".on"-function
                 if (typeof obj !== 'boolean') {
                     const change = this.runOnFunction(key, obj);
                     if (change) changedObjects.set(key, change);
                     this.updateCache(key);
                 }
             }
-            if (i>0) logger.debug('updateValuesAndValueListeners: loop runOnFunctions ' + (++i) + ' changedObject.size ' + changedObjects.size);
+            if (i>0) logger.debug('updateValuesAndValueListeners: loop runOnFunction ' + i + ' changedObject.size ' + changedObjects.size);
         }
         if (changedObjects.size)
             for (let i = 0; i < this.on.length; ++i) {
@@ -1779,7 +1786,7 @@ class VictronEnergyDevice {
     isStateOfChargeShown(priority, force)
     {
         logger.trace('VictronEnergyDevice::isStateOfChargeShown');
-        this.get('0xEEE5', priority, force);
+        return this.get('0xEEE5', priority, force);
     }
 
     writeDeviceConfig(newCurrent, oldCurrent, precision, timestamp)

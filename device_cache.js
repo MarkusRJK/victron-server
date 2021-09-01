@@ -76,17 +76,18 @@ class CacheObject {
         this.toHexStr = null;
         // if options exist, overwrite specific option:
         if (options === undefined) return;
-        if (options['description'])
+        if (typeof (options['description']) === 'string')
         {
             this.description = options['description'];
         }
         // example: pure int ==> precision := 0; 
         // 2 digits at the right of the decimal point ==> precision := -2
-        if (options['precision'])
+        if (typeof (options['precision']) === 'number')
         {
             this.precision = Math.pow(10, options['precision']);
         }
-        if (options['delta'])
+        // see precision
+        if (typeof (options['delta']) === 'number')
         {
             this.delta = Math.pow(10, options['delta']);
         }
@@ -94,7 +95,7 @@ class CacheObject {
         {
             this.formatted = options['formatter'];
         }
-        if (options['on'])
+        if (typeof (options['on']) === 'function')
         {
             this.on.push(options['on']);
         }
