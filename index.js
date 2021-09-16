@@ -936,7 +936,7 @@ class ReceiverTransmitter {
                     this.updateCache(key);
                 }
             }
-            if (i>0) logger.debug('updateValuesAndValueListeners: loop runOnFunction ' + i + ' changedObject.size ' + changedObjects.size);
+            //if (i>0) logger.debug('updateValuesAndValueListeners: loop runOnFunction ' + i + ' changedObject.size ' + changedObjects.size);
         }
         if (changedObjects.size)
             for (let i = 0; i < this.on.length; ++i) {
@@ -1003,6 +1003,10 @@ class ReceiverTransmitter {
                 logger.error('Device refused to set expected value: ' +
                              this.responseMap[id].expect + '; received: ' +
                              response.getMessage().substring(0, this.responseMap[id].expect.length));
+                // restart flips the relay back to OFF, i.e.
+                // restart is only safe if relay is OFF
+                if (bmvdata.relayState === 'OFF')
+                    this.restart();
                 this.restart();
             }
             else { // process response and remove it from Q and responseMap
@@ -1317,7 +1321,12 @@ class ReceiverTransmitter {
             sendTypeStr = 'Repeating command ('
                 + this.responseMap[commandId].doRetry + ') ';
             // FIXME: after restart the following response received: 4000051
-            if (this.responseMap[commandId].doRetry % 5 === 0) this.restart(); // TODO: put 5 as param/config
+            // TODO: put 5 as param/config
+            // restart() flips relay to OFF hence call restart only
+            // if relay is OFF
+            if (this.responseMap[commandId].doRetry % 5 === 0
+                && victronMap.get('Relay').value === 'OFF')
+                this.restart();
             if (this.responseMap[commandId].doRetry <= 0)
             {
                 // FIXME: don't delete but mark as timedout in case message still arrives
