@@ -80,17 +80,23 @@ class CacheObject {
         {
             this.description = options['description'];
         }
+        else logger.warn("CacheObject::constructor: String required for "
+                         + shortDescr + " option 'description' - ignored");
         // example: pure int ==> precision := 0; 
         // 2 digits at the right of the decimal point ==> precision := -2
         if (typeof (options['precision']) === 'number')
         {
             this.precision = Math.pow(10, options['precision']);
         }
+        else logger.warn("CacheObject::constructor: Number required for "
+                         + shortDescr + " option 'precision' - ignored");
         // see precision
         if (typeof (options['delta']) === 'number')
         {
             this.delta = Math.pow(10, options['delta']);
         }
+        else logger.warn("CacheObject::constructor: Number required for "
+                         + shortDescr + " option 'delta' - ignored");
         if (options['formatter'])
         {
             this.formatted = options['formatter'];
@@ -99,6 +105,8 @@ class CacheObject {
         {
             this.on.push(options['on']);
         }
+        else logger.warn("CacheObject::constructor: Function required for "
+                         + shortDescr + " option 'on' - ignored");
         if (options['fromHexStr'])
         {
             this.fromHexStr = options['fromHexStr'];

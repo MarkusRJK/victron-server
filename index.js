@@ -1007,7 +1007,6 @@ class ReceiverTransmitter {
                 // restart is only safe if relay is OFF
                 if (bmvdata.relayState === 'OFF')
                     this.restart();
-                this.restart();
             }
             else { // process response and remove it from Q and responseMap
                 switch (this.responseMap[id].func(response)) {
@@ -2001,6 +2000,9 @@ class VictronEnergyDevice {
     {
         logger.trace('VictronEnergyDevice::registerListener(' + property + ')');
         if (! property || ! listener) {
+            // FIXME: this indeed happened for batteryCurrent!!!
+            //        output: failed to register listener - property:batteryCurrent , listener: object
+
             logger.error('failed to register listener - property:' + property +
                          ' , listener: ' + typeof listener);
             return;
